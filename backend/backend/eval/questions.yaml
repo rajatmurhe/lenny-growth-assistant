@@ -1,0 +1,204 @@
+# Evaluation question set for the Lenny Growth Assistant
+# 30 questions covering: answerable (15), multi-hop (5), follow-up (5), ambiguous (2), out-of-corpus (3)
+# Expected episodes reference slugs from the starter pack.
+# Categories: answerable | multi_hop | follow_up | ambiguous | out_of_corpus
+
+questions:
+
+  # ── ANSWERABLE (direct, single episode) ──────────────────────────────────
+
+  - id: q001
+    category: answerable
+    question: "What did Molly Graham say about giving away your Legos in an AI world?"
+    expected_episodes: ["molly-graham-2"]
+    min_expected_in_top5: 1
+
+  - id: q002
+    category: answerable
+    question: "What advice did Peter Sellis give about product decisions at Discord?"
+    expected_episodes: ["peter-sellis"]
+    min_expected_in_top5: 1
+
+  - id: q003
+    category: answerable
+    question: "How did Roman Ugarte describe building Grok Bot in one month?"
+    expected_episodes: ["roman-ugarte"]
+    min_expected_in_top5: 1
+
+  - id: q004
+    category: answerable
+    question: "What does Anish Acharya mean by companies becoming a series of loops?"
+    expected_episodes: ["anish-acharya-2"]
+    min_expected_in_top5: 1
+
+  - id: q005
+    category: answerable
+    question: "What did Tara Seshan say about the rise of persistent AI coworkers?"
+    expected_episodes: ["tara-seshan"]
+    min_expected_in_top5: 1
+
+  - id: q006
+    category: answerable
+    question: "How does Jen Abel recommend closing $100K enterprise deals?"
+    expected_episodes: ["jen-abel-3"]
+    min_expected_in_top5: 1
+
+  - id: q007
+    category: answerable
+    question: "What did Ian Silber say about why now is a great time to be a designer?"
+    expected_episodes: ["ian-silber"]
+    min_expected_in_top5: 1
+
+  - id: q008
+    category: answerable
+    question: "What is Adam Ward's playbook for building high talent density teams?"
+    expected_episodes: ["adam-ward"]
+    min_expected_in_top5: 1
+
+  - id: q009
+    category: answerable
+    question: "What did Tom Verrilli say about whether product management should exist?"
+    expected_episodes: ["tom-verrilli"]
+    min_expected_in_top5: 1
+
+  - id: q010
+    category: answerable
+    question: "What is Molly Graham's specific advice about burnout and unclear ownership?"
+    expected_episodes: ["molly-graham-2"]
+    min_expected_in_top5: 1
+
+  - id: q011
+    category: answerable
+    question: "How did Jen Abel describe the difference between founder-led sales and handoff to a sales team?"
+    expected_episodes: ["jen-abel-3"]
+    min_expected_in_top5: 1
+
+  - id: q012
+    category: answerable
+    question: "What did Peter Sellis say about user behavior data versus intuition in product decisions?"
+    expected_episodes: ["peter-sellis"]
+    min_expected_in_top5: 1
+
+  - id: q013
+    category: answerable
+    question: "What framework did Tara Seshan share for thinking about AI agents in the workplace?"
+    expected_episodes: ["tara-seshan"]
+    min_expected_in_top5: 1
+
+  - id: q014
+    category: answerable
+    question: "What specific tactics did Adam Ward use to attract top talent at Cursor?"
+    expected_episodes: ["adam-ward"]
+    min_expected_in_top5: 1
+
+  - id: q015
+    category: answerable
+    question: "What did Anish Acharya say about growth loops and retention in consumer products?"
+    expected_episodes: ["anish-acharya-2"]
+    min_expected_in_top5: 1
+
+  # ── MULTI-HOP (requires evidence from multiple episodes) ─────────────────
+
+  - id: q016
+    category: multi_hop
+    question: "How do top product leaders think about team ownership and burnout across different company stages?"
+    expected_episodes: ["molly-graham-2", "peter-sellis"]
+    min_expected_in_top5: 2
+
+  - id: q017
+    category: multi_hop
+    question: "What do product leaders say about the impact of AI on team structure and individual contribution?"
+    expected_episodes: ["molly-graham-2", "tara-seshan", "ian-silber"]
+    min_expected_in_top5: 2
+
+  - id: q018
+    category: multi_hop
+    question: "How do enterprise sales and product strategy connect when building B2B SaaS products?"
+    expected_episodes: ["jen-abel-3", "tom-verrilli"]
+    min_expected_in_top5: 2
+
+  - id: q019
+    category: multi_hop
+    question: "What is the relationship between talent density and product quality at fast-growing startups?"
+    expected_episodes: ["adam-ward", "peter-sellis"]
+    min_expected_in_top5: 1
+
+  - id: q020
+    category: multi_hop
+    question: "How do growth loops and AI product work intersect in consumer and enterprise products?"
+    expected_episodes: ["anish-acharya-2", "tara-seshan"]
+    min_expected_in_top5: 1
+
+  # ── FOLLOW-UP (simulated second question after first) ─────────────────────
+
+  - id: q021
+    category: follow_up
+    question: "What specific examples did she give to illustrate the Legos framework?"
+    expected_episodes: ["molly-graham-2"]
+    min_expected_in_top5: 1
+    context_note: "Simulates follow-up after asking about Molly Graham's Legos advice"
+
+  - id: q022
+    category: follow_up
+    question: "What were the concrete metrics or numbers he mentioned?"
+    expected_episodes: ["roman-ugarte"]
+    min_expected_in_top5: 1
+    context_note: "Simulates follow-up about Grok Bot episode"
+
+  - id: q023
+    category: follow_up
+    question: "Did they give any counterexamples or caveats to that view?"
+    expected_episodes: ["peter-sellis", "tom-verrilli"]
+    min_expected_in_top5: 1
+    context_note: "Ambiguous 'they' — tests rewriter"
+
+  - id: q024
+    category: follow_up
+    question: "What did she recommend as the first step someone should take?"
+    expected_episodes: ["jen-abel-3"]
+    min_expected_in_top5: 1
+    context_note: "Simulates follow-up after Jen Abel enterprise sales question"
+
+  - id: q025
+    category: follow_up
+    question: "How does this connect to what other guests have said about the same topic?"
+    expected_episodes: ["molly-graham-2", "tara-seshan"]
+    min_expected_in_top5: 1
+    context_note: "Cross-episode synthesis request"
+
+  # ── AMBIGUOUS (vague, tests graceful handling) ────────────────────────────
+
+  - id: q026
+    category: ambiguous
+    question: "What do they say about leadership?"
+    expected_episodes: []  # Too vague to have specific expected episodes
+    min_expected_in_top5: 0
+    expected_refusal: false
+    context_note: "Should return some results but from multiple episodes"
+
+  - id: q027
+    category: ambiguous
+    question: "Is AI good or bad?"
+    expected_episodes: ["molly-graham-2", "tara-seshan"]
+    min_expected_in_top5: 0
+    context_note: "Very broad, should return evidence-grounded nuanced answer"
+
+  # ── OUT OF CORPUS (must refuse or say insufficient evidence) ─────────────
+
+  - id: q028
+    category: out_of_corpus
+    question: "What did Jeff Bezos say about Amazon's flywheel strategy?"
+    expected_refusal: true
+    expected_episodes: []
+
+  - id: q029
+    category: out_of_corpus
+    question: "What is the capital of France?"
+    expected_refusal: true
+    expected_episodes: []
+
+  - id: q030
+    category: out_of_corpus
+    question: "Give me a recipe for chocolate chip cookies."
+    expected_refusal: true
+    expected_episodes: []
