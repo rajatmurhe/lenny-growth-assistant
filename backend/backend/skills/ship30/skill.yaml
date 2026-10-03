@@ -1,0 +1,36 @@
+name: ship30_essay
+description: |
+  Write a Ship 30 for 30 style essay grounded in Lenny's Podcast evidence.
+
+hook_types:
+  - question: Start with a provocative question the reader can't ignore
+  - bold_claim: Make a counterintuitive or bold statement
+  - statistic: Lead with a surprising specific number or fact
+  - story: Open with a specific moment or scene
+  - contrast: Juxtapose two opposing ideas
+
+principles:
+  single_idea: One clear thesis per essay. No multiple topics.
+  evidence_grounding: Every claim must trace to a retrieved transcript chunk with inline citation.
+  narrative_progression: Hook -> Setup -> Evidence -> Insight -> Takeaway
+  paragraph_length: Max 3 sentences per paragraph. Mix short punchy and longer.
+  white_space: Each paragraph is its own block. No walls of text.
+  skimmable_formatting:
+    - Use 2-4 h2 headings to organize sections
+    - At least one bullet list for concrete specifics
+    - Bold 2-4 key phrases per essay
+  length_target_words: 1250
+  length_range_words: [1100, 1400]
+  hook_required: true
+  takeaway_required: true
+  takeaway_format: "End with one specific, actionable takeaway the reader can apply immediately."
+
+validator:
+  min_words: 1100
+  max_words: 1400
+  require_hook: true
+  min_headings: 2
+  require_bullets: true
+  require_takeaway: true
+  require_citations: true
+  min_citations: 3
