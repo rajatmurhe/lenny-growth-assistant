@@ -89,6 +89,32 @@ To prevent XSS (Cross-Site Scripting) attacks if the LLM generates malicious HTM
 
 ---
 
+## 🛠️ Design Decisions & Trade-offs
+
+Building a robust, local-first RAG pipeline requires careful architectural choices. Here is a breakdown of the key design decisions:
+
+1. **Why Local First (Ollama)?**
+   - *Cost & Privacy:* Running `llama3.2:3b` and `nomic-embed-text` locally ensures zero variable costs and complete data privacy for sensitive product research.
+   - *Resilience:* The app falls back to Anthropic seamlessly if configured, but the core engine runs completely offline.
+
+2. **Why PostgreSQL + pgvector?**
+   - *Simplicity & Scale:* By keeping both relational data (Sessions, Messages, Artifacts) and vector data (Chunks, Embeddings) in the same datastore, we eliminate the need for a separate, complex vector database like Pinecone or Milvus. 
+   - *Hybrid Search natively:* Postgres allows us to perform raw SQL queries that combine `tsvector` full-text search with `ivfflat` or `hnsw` vector distance calculations in a single transaction.
+
+3. **Why Server-Sent Events (SSE) instead of WebSockets?**
+   - *Unidirectional streaming:* For LLM token streaming, the data flows exclusively from Server to Client after the initial POST request. SSE provides a natively supported, resilient, and lightweight mechanism without the overhead and state-management complexity of full WebSockets.
+
+---
+
+## 🔄 Data Pipeline Deep-Dive
+
+The ingestion engine is designed to intelligently parse markdown transcripts:
+- **Speaker-Turn Awareness:** Instead of blindly chunking by character count (which destroys context), the chunker parses regex (`r'^\*\*(.+?)\*\* \((\d{2}:\d{2}:\d{2})\):'`) to group complete speaker thoughts.
+- **Overlap & Padding:** Each chunk carries over a 50-token window from the previous chunk to maintain conversational context.
+- **Idempotency:** The indexer uses a SHA-256 hash of the raw markdown. Running `make ingest` repeatedly will only re-embed episodes that have physically changed on disk.
+
+---
+
 ## ⚡ Quick Start (One Command)
 
 ### Prerequisites
@@ -143,6 +169,24 @@ Run the suite anytime using:
 ```bash
 make eval
 ```
+
+---
+
+### The 30-Question Ground Truth
+The evaluation uses a `questions.yaml` file containing:
+- **Answerable Queries**: Direct questions like *"What did Molly Graham say about giving away your Legos?"*
+- **Multi-hop Queries**: Broad questions requiring chunks from multiple episodes (e.g. *"How do top product leaders think about team ownership?"*)
+- **Out-of-Corpus Refusals**: Trick questions (e.g. *"What did Jeff Bezos say about Amazon's flywheel?"*) designed to test the strict absolute cosine-distance thresholding.
+
+---
+
+## 🔮 Future Roadmap
+
+While fully functional, here are the planned next steps for scaling the workspace:
+1. **User Authentication:** Integrate Firebase or Supabase Auth for multi-user isolation.
+2. **Cloud Deployment:** Include Terraform scripts for deploying the containerized stack to AWS ECS or GCP Cloud Run.
+3. **Advanced Chunking:** Implement semantic chunking models instead of relying purely on speaker turns.
+4. **Agentic Workflows:** Allow the LLM to recursively search the database if the initial RRF retrieval falls below the confidence threshold.
 
 ---
 
