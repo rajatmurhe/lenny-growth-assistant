@@ -36,7 +36,7 @@ async def upsert_episode_and_chunks(
     existing = result.scalars().first()
 
     if existing and existing.content_hash == episode.content_hash:
-        # No change — skip
+        # No change - skip
         return 0, 0
 
     if existing:

@@ -20,7 +20,7 @@ async def health_basic():
 
 @router.get("/health/live")
 async def health_live():
-    """Liveness probe — just confirms the process is up."""
+    """Liveness probe - just confirms the process is up."""
     return {"status": "alive"}
 
 

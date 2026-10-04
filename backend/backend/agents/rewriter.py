@@ -13,7 +13,7 @@ Rules:
 - If the message is already standalone (no pronouns like "it", "that", "they" that reference prior context), return it UNCHANGED.
 - If the message references prior context (e.g., "tell me more about that", "what else did she say?"), rewrite it to be explicit.
 - Output ONLY the rewritten query, nothing else. No explanation.
-- Keep the query concise — under 100 words.
+- Keep the query concise - under 100 words.
 - Preserve the user's intent exactly.
 
 Examples:
@@ -74,5 +74,5 @@ async def rewrite_query(
         )
         return rewritten.strip()
     except Exception:
-        # If rewriting fails, fall back to original message — never block the user
+        # If rewriting fails, fall back to original message - never block the user
         return current_message

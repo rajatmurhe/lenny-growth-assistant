@@ -92,7 +92,7 @@ Copy `.env.example` to `.env` and configure to your liking.
 | `POSTGRES_DB` | ✅ | `lenny_db` | Database name |
 | `OLLAMA_BASE_URL` | ✅ | `http://host.docker.internal:11434`| Connects container to host's Ollama |
 | `OLLAMA_CHAT_MODEL` | ✅ | `llama3.2:3b` | Chat model to use |
-| `ANTHROPIC_API_KEY` | ⬜ | — | Optional. Enables cloud provider if set |
+| `ANTHROPIC_API_KEY` | ⬜ | - | Optional. Enables cloud provider if set |
 | `RETRIEVAL_TOP_K` | ⬜ | `10` | Chunks retrieved per query |
 
 ---

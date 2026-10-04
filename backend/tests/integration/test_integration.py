@@ -226,12 +226,12 @@ class TestRetrieval:
         """After make ingest, chunks table must have entries."""
         result = await db.execute(text("SELECT COUNT(*) FROM chunks"))
         count = result.scalar()
-        assert count > 0, "No chunks found — run make ingest first"
+        assert count > 0, "No chunks found - run make ingest first"
 
     async def test_episodes_exist_after_ingest(self, db):
         result = await db.execute(text("SELECT COUNT(*) FROM episodes"))
         count = result.scalar()
-        assert count > 0, "No episodes found — run make ingest first"
+        assert count > 0, "No episodes found - run make ingest first"
 
     async def test_chunks_have_embeddings(self, db):
         """Every chunk should have a non-null embedding vector."""

@@ -2,7 +2,7 @@
 
 # Default target
 help:
-	@echo "Lenny Growth Assistant — Available Commands"
+	@echo "Lenny Growth Assistant - Available Commands"
 	@echo "─────────────────────────────────────────────"
 	@echo "  make up       Start all services (Docker Compose)"
 	@echo "  make down     Stop all services"

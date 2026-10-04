@@ -117,7 +117,7 @@ export function ChatPane({ session, onNewMessage, onArtifactCreated, onNewChat }
             </div>
             <h2>Lenny Growth Assistant</h2>
             <p className="chat-empty-sub">
-              Ask questions grounded in real podcast transcripts — with inline citations, Ship 30 essays, and exportable artifacts.
+              Ask questions grounded in real podcast transcripts - with inline citations, Ship 30 essays, and exportable artifacts.
             </p>
             {session && (
               <div className="chat-suggestions" role="list">

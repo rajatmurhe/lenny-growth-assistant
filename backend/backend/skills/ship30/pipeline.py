@@ -72,7 +72,7 @@ DRAFT_SYSTEM = """You are a Ship 30 for 30 essay writer. Write a complete essay 
 
 REPAIR_SYSTEM = """You are a Ship 30 essay editor. Fix the specific issues identified in the validation below.
 Keep all valid content. Only change what's needed to pass validation.
-Maintain all existing citations — do not remove [n] references.
+Maintain all existing citations - do not remove [n] references.
 """
 
 

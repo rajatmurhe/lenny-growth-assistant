@@ -18,7 +18,7 @@ def _load_skill_config():
 
 def _make_valid_essay(word_count: int = 1200) -> str:
     """Generate a structurally valid essay of approximately word_count words."""
-    hook = "Why do most product managers fail at user research? They ask the wrong questions. The issue is not effort or intelligence — it is a fundamental misunderstanding of what user research is actually for."
+    hook = "Why do most product managers fail at user research? They ask the wrong questions. The issue is not effort or intelligence - it is a fundamental misunderstanding of what user research is actually for."
     
     heading1 = "\n\n## The Research Trap Most PMs Fall Into\n\n"
     para1 = "Peter Sellis from Discord spent years watching PMs conduct research that led nowhere [1]. The problem was not effort but method. Teams would run surveys when they needed conversations, and focus groups when they needed observation. This misalignment between method and question type is the root cause of most research failure."

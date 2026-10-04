@@ -12,7 +12,7 @@ from backend.providers.base import ChatMessage
 from backend.retrieval.hybrid import RetrievedChunk
 
 
-SYSTEM_PROMPT = """You are a research assistant for Lenny's Podcast — a podcast about product management and growth.
+SYSTEM_PROMPT = """You are a research assistant for Lenny's Podcast - a podcast about product management and growth.
 
 Your job is to answer questions STRICTLY based on the provided context from podcast transcripts.
 

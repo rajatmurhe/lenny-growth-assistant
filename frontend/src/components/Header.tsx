@@ -14,9 +14,9 @@ export function Header({ health, activeProvider, activeModel, onProviderClick }:
     if (!health || status === 'ready') return null;
     const c = health.checks;
     if (c.database?.status === 'down') return 'Database unreachable';
-    if (c.ollama?.status === 'down') return 'Ollama unreachable — start Ollama on your host';
-    if (!c.ollama?.model_present) return `Model missing — run: ollama pull ${c.ollama?.model}`;
-    if (c.index_populated?.status === 'empty') return 'Index empty — run: make ingest';
+    if (c.ollama?.status === 'down') return 'Ollama unreachable - start Ollama on your host';
+    if (!c.ollama?.model_present) return `Model missing - run: ollama pull ${c.ollama?.model}`;
+    if (c.index_populated?.status === 'empty') return 'Index empty - run: make ingest';
     return 'System degraded';
   })();
 
