@@ -5,34 +5,61 @@
 ![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
 ![React](https://img.shields.io/badge/react-18-cyan)
 
-A grounded, local-first product intelligence workspace for PMs. Built on **50 transcribed episodes** of Lenny's Podcast, this AI assistant answers complex product questions, drafts "Ship 30 for 30" style essays, and generates standalone markdown/HTML artifacts using a hybrid retrieval engine and the Llama 3.2 model.
+A grounded, local-first product intelligence workspace for Product Managers. Built on top of **50 transcribed episodes** of Lenny's Podcast, this AI assistant is engineered to provide strictly factual, citable answers to complex product questions, completely eliminating hallucination.
 
 ---
 
-## 📸 Screenshots
+## 📸 The Application in Action
 
-### Main Workspace
-![App View](docs/assets/app_view.png)
-*The unified split-pane interface: Chat history (left), conversational agent with inline citations (center), and sandboxed artifact viewer (right).*
+*A fully polished, split-pane workspace designed for deep focus and research.*
 
-### Cloud Fallback & Health
-![Provider Modal](docs/assets/modal_view.png)
-*Graceful UI degradation. The app runs 100% locally via Ollama, but seamlessly supports Anthropic models if an API key is provided.*
+| ![Screenshot 1](docs/assets/screenshot1.png) | ![Screenshot 2](docs/assets/screenshot2.png) |
+|:---:|:---:|
+| *Main Conversational Interface* | *Grounded Insights & Ship 30 Essays* |
 
----
-
-## ✨ Features
-
-- **Hybrid Search Engine**: Combines Full-Text Search (FTS) and `pgvector` embeddings with Reciprocal Rank Fusion (RRF) for high-precision context retrieval.
-- **Strict Grounding**: The agent refuses to answer out-of-corpus questions (e.g. "What is the capital of France?") using absolute cosine distance thresholding.
-- **Ship 30 Essay Generator**: A specialized pipeline that outlines, drafts, and structurally validates high-converting essays.
-- **Secure Artifact Viewer**: A completely sandboxed rendering surface (no `allow-scripts`, no `allow-same-origin`) paired with server-side `nh3` sanitization to prevent XSS attacks.
-- **Dual Providers (Local & Cloud)**: Built to run entirely offline via Ollama, with optional routing to Anthropic Claude.
-- **Polished UI/UX**: Premium editorial theme, responsive layout, fluid CSS transitions, and SSE token streaming.
+| ![Screenshot 3](docs/assets/screenshot3.png) | ![Screenshot 4](docs/assets/screenshot4.png) |
+|:---:|:---:|
+| *Sandboxed Artifact Viewer* | *Provider Settings & Cloud Fallbacks* |
 
 ---
 
-## 🏗️ Architecture
+## 🚀 What This Project Does
+
+Product managers, founders, and growth engineers often struggle to recall specific insights, mental models, or quotes from dense, hour-long podcast episodes. The **Lenny Growth Assistant** solves this by turning the podcast archive into an interactive, highly accurate oracle.
+
+### Core Capabilities:
+1. **Grounded Q&A with Inline Citations**: Ask a question like *"What did Molly Graham say about giving away your Legos?"* The agent will answer using **only** the transcribed context, providing clickable inline citations (e.g., `[1]`) that map to the exact speaker-turn chunk it used.
+2. **Out-of-Corpus Refusal**: If you ask it a question not covered in the podcast (e.g., *"What is the capital of France?"*), the system detects this via vector distance thresholding and gracefully refuses, suggesting the closest topical episodes instead.
+3. **Ship 30 for 30 Essay Generation**: A specialized pipeline that outlines, drafts, and structurally validates high-converting, 1,200-word essays formatted perfectly for online publishing—all grounded in the podcast data.
+4. **Rich Artifacts**: The assistant can generate standalone markdown or HTML artifacts (like memos, templates, or checklists) and render them in a dedicated right-hand preview panel.
+
+---
+
+## 🧠 How It Works Under The Hood
+
+The system relies on a complex, fully local RAG (Retrieval-Augmented Generation) pipeline using **FastAPI** and **Llama 3.2**.
+
+### 1. Ingestion & Embedding
+We process raw markdown transcripts into speaker-aware chunks (averaging 500 tokens with overlaps). These chunks are embedded using `nomic-embed-text` directly into a **PostgreSQL** database using the `pgvector` extension.
+
+### 2. Hybrid Retrieval (RRF)
+To guarantee we find the right context, we use a **Hybrid Search Engine**. When a user asks a question:
+- **Vector Search**: Finds semantic matches based on embedding proximity.
+- **Full-Text Search (FTS)**: Finds exact keyword matches (crucial for names or specific product acronyms).
+The results are mathematically merged using **Reciprocal Rank Fusion (RRF)** to get the absolute best context chunks.
+
+### 3. Prompt Injection Defense
+The retrieved context is injected into the LLM prompt wrapped in `<UNTRUSTED_CONTEXT>` XML tags. The system prompt is engineered to heavily penalize the LLM if it hallucinates or follows instructions found within the untrusted transcripts.
+
+### 4. Post-Generation Citation Validation
+Before streaming the final results to the user, the backend runs a structural validation pass to ensure every single citation `[n]` emitted by the LLM corresponds mathematically to the chunks we retrieved. If it fabricated a citation, the chunk is flagged.
+
+### 5. Secure Artifact Rendering
+To prevent XSS (Cross-Site Scripting) attacks if the LLM generates malicious HTML, the frontend's Artifact Viewer utilizes a heavily restricted `iframe` (`sandbox=""` with no `allow-scripts` or `allow-same-origin`) combined with a strict Content-Security Policy.
+
+---
+
+## 🏗️ System Architecture
 
 ```text
 ┌─────────────┐       ┌───────────────────────────────────────────────┐
@@ -54,7 +81,7 @@ A grounded, local-first product intelligence workspace for PMs. Built on **50 tr
 
 ---
 
-## 🚀 Quick Start (One Command)
+## ⚡ Quick Start (One Command)
 
 ### Prerequisites
 - **Docker Desktop** (with Compose v2)
@@ -97,30 +124,17 @@ Copy `.env.example` to `.env` and configure to your liking.
 
 ---
 
-## 🧪 Testing & Evaluation
+## 🧪 Evaluation Framework
 
-This project includes a rigorous automated evaluation suite for testing citation validity, retrieval hit rate, and prompt injection defense.
+This project includes a rigorous automated evaluation suite designed to grade the system against 30 ground-truth questions. It measures:
+1. **Hit Rate**: Are the correct source episodes in the top 10 retrieved chunks?
+2. **Refusal Correctness**: Does the system properly refuse out-of-corpus questions?
+3. **Citation Validity**: Does every output citation map to a real retrieved chunk?
 
+Run the suite anytime using:
 ```bash
-# Run the full testing suite (requires DB)
-make test
-
-# Run the 30-question Ground Truth Evaluation
 make eval
 ```
-
----
-
-## 🛠️ Make Commands
-
-| Command | Action |
-|---------|--------|
-| `make up` | Start all services and run health checks. |
-| `make down` | Tear down containers safely. |
-| `make build` | Rebuild images from scratch. |
-| `make ingest` | Run the chunking and vector embedding pipeline. |
-| `make shell-backend` | Bash into the running backend. |
-| `make shell-db` | Launch `psql` in the running database. |
 
 ---
 
