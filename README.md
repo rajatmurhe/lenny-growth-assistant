@@ -1,4 +1,4 @@
-# Lenny Growth Assistant 🧠
+# Lenny Growth Assistant
 
 ![Build Status](https://img.shields.io/badge/build-passing-success)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
@@ -9,7 +9,7 @@ A grounded, local-first product intelligence workspace for Product Managers. Bui
 
 ---
 
-## 📸 The Application in Action
+## The Application in Action
 
 *A fully polished, split-pane workspace designed for deep focus and research.*
 
@@ -31,7 +31,7 @@ A grounded, local-first product intelligence workspace for Product Managers. Bui
 
 ---
 
-## 🚀 What This Project Does
+## What This Project Does
 
 Product managers, founders, and growth engineers often struggle to recall specific insights, mental models, or quotes from dense, hour-long podcast episodes. The **Lenny Growth Assistant** solves this by turning the podcast archive into an interactive, highly accurate oracle.
 
@@ -43,7 +43,7 @@ Product managers, founders, and growth engineers often struggle to recall specif
 
 ---
 
-## 🧠 How It Works Under The Hood
+## How It Works Under The Hood
 
 The system relies on a complex, fully local RAG (Retrieval-Augmented Generation) pipeline using **FastAPI** and **Llama 3.2**.
 
@@ -67,7 +67,7 @@ To prevent XSS (Cross-Site Scripting) attacks if the LLM generates malicious HTM
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```text
 ┌─────────────┐       ┌───────────────────────────────────────────────┐
@@ -89,7 +89,7 @@ To prevent XSS (Cross-Site Scripting) attacks if the LLM generates malicious HTM
 
 ---
 
-## 🛠️ Design Decisions & Trade-offs
+## Design Decisions & Trade-offs
 
 Building a robust, local-first RAG pipeline requires careful architectural choices. Here is a breakdown of the key design decisions:
 
@@ -106,7 +106,7 @@ Building a robust, local-first RAG pipeline requires careful architectural choic
 
 ---
 
-## 🔄 Data Pipeline Deep-Dive
+## Data Pipeline Deep-Dive
 
 The ingestion engine is designed to intelligently parse markdown transcripts:
 - **Speaker-Turn Awareness:** Instead of blindly chunking by character count (which destroys context), the chunker parses regex (`r'^\*\*(.+?)\*\* \((\d{2}:\d{2}:\d{2})\):'`) to group complete speaker thoughts.
@@ -115,7 +115,7 @@ The ingestion engine is designed to intelligently parse markdown transcripts:
 
 ---
 
-## ⚡ Quick Start (One Command)
+## Quick Start (One Command)
 
 ### Prerequisites
 - **Docker Desktop** (with Compose v2)
@@ -142,23 +142,23 @@ open http://localhost:3000
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 Copy `.env.example` to `.env` and configure to your liking.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `POSTGRES_USER` | ✅ | `lenny` | Database username |
-| `POSTGRES_PASSWORD` | ✅ | `lenny_secret` | Database password |
-| `POSTGRES_DB` | ✅ | `lenny_db` | Database name |
-| `OLLAMA_BASE_URL` | ✅ | `http://host.docker.internal:11434`| Connects container to host's Ollama |
-| `OLLAMA_CHAT_MODEL` | ✅ | `llama3.2:3b` | Chat model to use |
-| `ANTHROPIC_API_KEY` | ⬜ | - | Optional. Enables cloud provider if set |
-| `RETRIEVAL_TOP_K` | ⬜ | `10` | Chunks retrieved per query |
+| `POSTGRES_USER` | Yes | `lenny` | Database username |
+| `POSTGRES_PASSWORD` | Yes | `lenny_secret` | Database password |
+| `POSTGRES_DB` | Yes | `lenny_db` | Database name |
+| `OLLAMA_BASE_URL` | Yes | `http://host.docker.internal:11434`| Connects container to host's Ollama |
+| `OLLAMA_CHAT_MODEL` | Yes | `llama3.2:3b` | Chat model to use |
+| `ANTHROPIC_API_KEY` | No | - | Optional. Enables cloud provider if set |
+| `RETRIEVAL_TOP_K` | No | `10` | Chunks retrieved per query |
 
 ---
 
-## 🧪 Evaluation Framework
+## Evaluation Framework
 
 This project includes a rigorous automated evaluation suite designed to grade the system against 30 ground-truth questions. It measures:
 1. **Hit Rate**: Are the correct source episodes in the top 10 retrieved chunks?
@@ -180,7 +180,7 @@ The evaluation uses a `questions.yaml` file containing:
 
 ---
 
-## 🔮 Future Roadmap
+## Future Roadmap
 
 While fully functional, here are the planned next steps for scaling the workspace:
 1. **User Authentication:** Integrate Firebase or Supabase Auth for multi-user isolation.
@@ -190,7 +190,7 @@ While fully functional, here are the planned next steps for scaling the workspac
 
 ---
 
-## 📜 License & Usage
+## License & Usage
 
 - **Codebase**: MIT License.
 - **Transcript Corpus** (`data/transcripts/`): Licensed under Lenny's starter pack terms (Personal and non-commercial use permitted; Raw redistribution not allowed). See `data/transcripts/LICENSE.md` for full details.
