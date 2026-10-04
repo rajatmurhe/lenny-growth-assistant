@@ -1,227 +1,130 @@
-# Lenny Growth Assistant
+# Lenny Growth Assistant 🧠
 
-> A grounded product and growth intelligence workspace for PMs and growth operators.
-> Ask questions about podcast transcripts → get evidence-backed answers with citations → write Ship 30 essays → export artifacts.
+![Build Status](https://img.shields.io/badge/build-passing-success)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
+![React](https://img.shields.io/badge/react-18-cyan)
 
----
-
-## Architecture Overview
-
-```
-┌─────────────┐     SSE stream      ┌───────────────────────────────────┐
-│   Browser   │◄────────────────────│  FastAPI Backend (port 8000)       │
-│  React+Vite │────── POST ─────────│  ├── Router (rules→LLM fallback)   │
-│  (port 3000)│                     │  ├── Query Rewriter                │
-└─────────────┘                     │  ├── Hybrid Retrieval (pgvector+FTS)│
-                                    │  ├── Grounded Answer Agent          │
-┌─────────────┐                     │  ├── Ship 30 Pipeline              │
-│  PostgreSQL  │◄───────────────────│  └── Artifact Agent                │
-│  +pgvector   │                    └───────────────────────────────────┘
-│  (port 5432) │                              │
-└─────────────┘                    ┌──────────▼──────────┐
-                                   │   Ollama (host)      │
-                                   │   llama3.2:3b (chat) │
-                                   │   nomic-embed-text   │
-                                   └─────────────────────┘
-```
-
-**Request flow:** Message → Query rewrite (condensed standalone query) → Route (rules-first) → Hybrid retrieve (pgvector + FTS via RRF) → Relevance gate → Generate with `<UNTRUSTED_CONTEXT>` grounding → Validate citations → Persist → Stream SSE to UI.
-
-**Grounding contract:** The system answers *only* from retrieved transcript chunks. Below threshold → "Insufficient Evidence" response. Every `[n]` citation is validated against the retrieved set post-generation.
-
-**Artifact security:** Sandboxed iframe (`sandbox=""` — no `allow-scripts`, no `allow-same-origin`) + CSP meta `default-src 'none'; style-src 'unsafe-inline'; img-src data:` + server-side nh3 sanitization before storage. The artifact viewer is a rendering surface, not an execution environment.
+A grounded, local-first product intelligence workspace for PMs. Built on **50 transcribed episodes** of Lenny's Podcast, this AI assistant answers complex product questions, drafts "Ship 30 for 30" style essays, and generates standalone markdown/HTML artifacts using a hybrid retrieval engine and the Llama 3.2 model.
 
 ---
 
-## Prerequisites
+## 📸 Screenshots
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Docker Desktop | 4.x+ | With Compose v2 |
-| Ollama | 0.3+ | Running locally before `make up` |
-| Git | any | For transcript cloning |
+### Main Workspace
+![App View](docs/assets/app_view.png)
+*The unified split-pane interface: Chat history (left), conversational agent with inline citations (center), and sandboxed artifact viewer (right).*
 
-**Ollama models to pull before starting:**
+### Cloud Fallback & Health
+![Provider Modal](docs/assets/modal_view.png)
+*Graceful UI degradation. The app runs 100% locally via Ollama, but seamlessly supports Anthropic models if an API key is provided.*
+
+---
+
+## ✨ Features
+
+- **Hybrid Search Engine**: Combines Full-Text Search (FTS) and `pgvector` embeddings with Reciprocal Rank Fusion (RRF) for high-precision context retrieval.
+- **Strict Grounding**: The agent refuses to answer out-of-corpus questions (e.g. "What is the capital of France?") using absolute cosine distance thresholding.
+- **Ship 30 Essay Generator**: A specialized pipeline that outlines, drafts, and structurally validates high-converting essays.
+- **Secure Artifact Viewer**: A completely sandboxed rendering surface (no `allow-scripts`, no `allow-same-origin`) paired with server-side `nh3` sanitization to prevent XSS attacks.
+- **Dual Providers (Local & Cloud)**: Built to run entirely offline via Ollama, with optional routing to Anthropic Claude.
+- **Polished UI/UX**: Premium editorial theme, responsive layout, fluid CSS transitions, and SSE token streaming.
+
+---
+
+## 🏗️ Architecture
+
+```text
+┌─────────────┐       ┌───────────────────────────────────────────────┐
+│  React+Vite │──────►│ FastAPI Backend                                 │
+│  (port 3000)│◄──────│ (SSE Streams)                                 │
+└─────────────┘       │                                               │
+      │               │  ├── Query Rewriter                           │
+      │               │  ├── Hybrid Retrieval (pgvector + FTS)        │
+      │               │  ├── Prompt Router & Citation Validator       │
+      │               │  └── Security (nh3 Sanitization)              │
+      │               └───────────────────────────────────────────────┘
+      │                               │                       │
+┌─────▼───────┐               ┌───────▼─────────────┐ ┌───────▼─────────────┐
+│ PostgreSQL  │◄──────────────│ Ollama (Local)      │ │ Anthropic (Cloud)   │
+│ + pgvector  │               │ - llama3.2:3b       │ │ - claude-3-5-haiku  │
+│ (port 5432) │               │ - nomic-embed-text  │ │ (Optional)          │
+└─────────────┘               └─────────────────────┘ └─────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start (One Command)
+
+### Prerequisites
+- **Docker Desktop** (with Compose v2)
+- **Ollama** running locally on your host machine.
+
+### Start the stack
 ```bash
-ollama pull llama3.2:3b        # Chat model (~2GB)
-ollama pull nomic-embed-text   # Embedding model (~274MB)
-```
-
----
-
-## Quick Start (one command)
-
-```bash
-git clone <this-repo> lenny-growth-assistant
+git clone https://github.com/rajatmurhe/lenny-growth-assistant.git
 cd lenny-growth-assistant
 
-# 1. Start all services
+# 1. Pull the local models via Ollama
+ollama pull llama3.2:3b
+ollama pull nomic-embed-text
+
+# 2. Boot all services
 make up
 
-# 2. Ingest transcripts (first run: ~10 min, embeds 50 episodes)
+# 3. Ingest the transcripts (Takes ~5-10 minutes)
 make ingest
 
-# 3. Open the app
+# 4. Open the app!
 open http://localhost:3000
 ```
 
-`make up` automatically copies `.env.example` → `.env` on first run.
-
 ---
 
-## Environment Variables
+## ⚙️ Environment Variables
 
-Copy `.env.example` to `.env` and edit as needed.
+Copy `.env.example` to `.env` and configure to your liking.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `POSTGRES_USER` | ✅ | `lenny` | PostgreSQL username |
-| `POSTGRES_PASSWORD` | ✅ | `lenny_secret` | **Change in production** |
+| `POSTGRES_USER` | ✅ | `lenny` | Database username |
+| `POSTGRES_PASSWORD` | ✅ | `lenny_secret` | Database password |
 | `POSTGRES_DB` | ✅ | `lenny_db` | Database name |
-| `OLLAMA_BASE_URL` | ✅ | `http://host.docker.internal:11434` | Ollama URL (Docker uses host-gateway) |
-| `OLLAMA_CHAT_MODEL` | ✅ | `llama3.2:3b` | Chat model name in Ollama |
-| `OLLAMA_EMBED_MODEL` | ✅ | `nomic-embed-text` | Embedding model name |
-| `ANTHROPIC_API_KEY` | ⬜ | — | If set, enables Anthropic provider in UI |
-| `ANTHROPIC_CHAT_MODEL` | ⬜ | `claude-3-5-haiku-20241022` | Anthropic model to use |
-| `ACTIVE_PROVIDER` | ⬜ | `ollama` | Default provider at startup |
-| `RETRIEVAL_TOP_K` | ⬜ | `10` | Chunks to retrieve per query |
-| `RETRIEVAL_THRESHOLD` | ⬜ | `0.35` | RRF score threshold for "insufficient evidence" |
-| `LOG_LEVEL` | ⬜ | `INFO` | `DEBUG` / `INFO` / `WARNING` |
-| `VITE_API_URL` | ⬜ | `http://localhost:8000` | Backend URL as seen from browser |
+| `OLLAMA_BASE_URL` | ✅ | `http://host.docker.internal:11434`| Connects container to host's Ollama |
+| `OLLAMA_CHAT_MODEL` | ✅ | `llama3.2:3b` | Chat model to use |
+| `ANTHROPIC_API_KEY` | ⬜ | — | Optional. Enables cloud provider if set |
+| `RETRIEVAL_TOP_K` | ⬜ | `10` | Chunks retrieved per query |
 
-### Swapping the chat model
+---
+
+## 🧪 Testing & Evaluation
+
+This project includes a rigorous automated evaluation suite for testing citation validity, retrieval hit rate, and prompt injection defense.
 
 ```bash
-# Pull a better model (needs ~8GB RAM)
-ollama pull qwen2.5:7b-instruct
-
-# Update .env
-OLLAMA_CHAT_MODEL=qwen2.5:7b-instruct
-
-# Restart backend
-docker compose restart backend
-```
-
----
-
-## Local Development (without Docker)
-
-```bash
-# Backend
-cd backend
-pip install -e ".[dev]"
-# Set env vars manually or export from .env
-uvicorn backend.api.main:app --reload --port 8000
-
-# Frontend
-cd frontend
-npm install
-npm run dev  # http://localhost:5173
-```
-
----
-
-## Makefile Reference
-
-| Command | Description |
-|---------|-------------|
-| `make up` | Start all services, wait for readiness, run health check |
-| `make down` | Stop all services |
-| `make build` | Rebuild Docker images from scratch |
-| `make ingest` | Clone transcripts and run ingestion pipeline |
-| `make test` | Run full test suite (unit + integration + security) |
-| `make test-unit` | Unit tests only |
-| `make test-security` | XSS sanitizer tests |
-| `make eval` | Run evaluation against 30 ground-truth questions |
-| `make logs` | Tail logs from all services |
-| `make clean` | Remove containers, volumes, and build artifacts |
-| `make shell-backend` | Open bash in running backend container |
-| `make shell-db` | Open psql in running database container |
-
----
-
-## API Reference
-
-### Health
-- `GET /health` → `{"status": "ok"}`
-- `GET /health/ready` → detailed readiness check (DB, Ollama, index, Anthropic)
-
-### Sessions
-- `POST /sessions` → create session
-- `GET /sessions` → list sessions (last 50)
-- `GET /sessions/{id}` → session with messages
-- `POST /sessions/{id}/messages` → **SSE stream** (body: `{"content": "..."}`)
-- `POST /sessions/{id}/provider` → switch provider for this session
-
-### Config
-- `GET /config/providers` → available providers and their status
-
-### Admin
-- `POST /admin/ingest` → trigger ingestion run (background)
-- `GET /admin/ingest/{run_id}` → ingestion run status
-
-### Artifacts
-- `GET /artifacts/{id}` → artifact content
-- `GET /artifacts/{id}/versions` → version history
-
-### SSE Event Types
-```json
-{"type": "token", "content": "..."}
-{"type": "citations", "citations": [...]}
-{"type": "insufficient_evidence", "message": "...", "closest_episodes": [...]}
-{"type": "validation", "passed": true, "word_count": 1247, "failures": []}
-{"type": "artifact", "artifact_id": "...", "title": "..."}
-{"type": "error", "message": "...", "code": "..."}
-{"type": "done", "latency_ms": 4200}
-```
-
----
-
-## Cloud Mode (Anthropic)
-
-1. Set `ANTHROPIC_API_KEY=sk-ant-...` in `.env`
-2. Restart: `docker compose restart backend`
-3. In the UI, click the provider badge (top-right) → select Anthropic
-4. Embeddings always use Ollama (`nomic-embed-text`) regardless of chat provider
-
----
-
-## Resilience Behavior
-
-| Failure | System Response |
-|---------|----------------|
-| Ollama unreachable | `/health/ready` → `degraded`; UI banner; Anthropic used if key set |
-| Model timeout | Bounded to `REQUEST_TIMEOUT_S`; 1 retry; structured error returned |
-| Empty retrieval | "Insufficient Evidence" response + 3 closest episode suggestions |
-| Index empty | `/health/ready` → `degraded`; prompt to run `make ingest` |
-| DB connection failure | `/health/ready` → `not_ready`; UI degraded banner |
-| Missing API key | Anthropic disabled in provider selector with visible reason |
-
----
-
-## Running Tests
-
-```bash
-# All tests
+# Run the full testing suite (requires DB)
 make test
 
-# Unit tests (no DB needed)
-make test-unit
-
-# Security (XSS sanitizer corpus)
-make test-security
-
-# Evaluation (needs running stack + ingested data)
+# Run the 30-question Ground Truth Evaluation
 make eval
 ```
 
 ---
 
-## License & Transcript Usage
+## 🛠️ Make Commands
 
-The transcript corpus (`data/transcripts/`) is licensed under Lenny's starter pack terms:
-- ✅ Personal and non-commercial use permitted
-- ❌ Raw redistribution of transcripts not allowed
-- See `data/transcripts/LICENSE.md` for full terms
+| Command | Action |
+|---------|--------|
+| `make up` | Start all services and run health checks. |
+| `make down` | Tear down containers safely. |
+| `make build` | Rebuild images from scratch. |
+| `make ingest` | Run the chunking and vector embedding pipeline. |
+| `make shell-backend` | Bash into the running backend. |
+| `make shell-db` | Launch `psql` in the running database. |
 
-This codebase (excluding transcripts) is available under MIT license.
+---
+
+## 📜 License & Usage
+
+- **Codebase**: MIT License.
+- **Transcript Corpus** (`data/transcripts/`): Licensed under Lenny's starter pack terms (Personal and non-commercial use permitted; Raw redistribution not allowed). See `data/transcripts/LICENSE.md` for full details.
