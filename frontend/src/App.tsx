@@ -75,6 +75,19 @@ export default function App() {
     }
   }, []);
 
+  const handleDeleteSession = useCallback(async (id: string) => {
+    try {
+      await api.deleteSession(id);
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      if (activeSession?.id === id) {
+        setActiveSession(null);
+        setActiveArtifactId(null);
+      }
+    } catch (e) {
+      console.error('Failed to delete session', e);
+    }
+  }, [activeSession]);
+
   // Refresh session after message sent (to get persisted messages)
   const handleMessageSent = useCallback(async (sessionId: string) => {
     try {
@@ -137,6 +150,7 @@ export default function App() {
           activeSessionId={activeSession?.id ?? null}
           onSelect={handleSelectSession}
           onNewChat={handleNewChat}
+          onDelete={handleDeleteSession}
         />
 
         <ChatPane

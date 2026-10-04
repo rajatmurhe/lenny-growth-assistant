@@ -26,6 +26,9 @@ export const api = {
 
   getSession: (id: string) => apiFetch<Session>(`/sessions/${id}`),
 
+  deleteSession: (id: string) => 
+    apiFetch<{status: string}>(`/sessions/${id}`, { method: 'DELETE' }),
+
   updateProvider: (sessionId: string, provider: string) =>
     apiFetch<{ provider: string; model: string }>(`/sessions/${sessionId}/provider`, {
       method: 'POST',

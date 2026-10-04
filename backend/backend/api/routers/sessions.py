@@ -11,7 +11,7 @@ from typing import AsyncIterator
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import settings
@@ -21,6 +21,32 @@ from backend.providers.factory import get_embed_provider, get_provider
 from backend.retrieval.hybrid import hybrid_retrieve
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
+
+
+@router.delete("/{session_id}")
+async def delete_session(session_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    """Delete a session and all its associated messages and artifacts."""
+    # SQLAlchemy requires explicit deletion order if CASCADE is not set on foreign keys.
+    await db.execute(delete(Artifact).where(Artifact.session_id == session_id))
+    
+    # Retrieval events are linked to messages, so we must delete them first
+    # Find all message IDs for this session
+    stmt = select(Message.id).where(Message.session_id == session_id)
+    result = await db.execute(stmt)
+    msg_ids = [row[0] for row in result.fetchall()]
+    
+    if msg_ids:
+        await db.execute(delete(RetrievalEvent).where(RetrievalEvent.message_id.in_(msg_ids)))
+        
+    await db.execute(delete(Message).where(Message.session_id == session_id))
+    result = await db.execute(delete(Session).where(Session.id == session_id))
+    
+    if result.rowcount == 0:
+        raise HTTPException(status_code=404, detail="Session not found")
+        
+    await db.commit()
+    return {"status": "ok"}
+
 
 
 # ── Pydantic schemas ────────────────────────────────────────────────────────
