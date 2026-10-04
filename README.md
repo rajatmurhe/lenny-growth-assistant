@@ -13,13 +13,21 @@ A grounded, local-first product intelligence workspace for Product Managers. Bui
 
 *A fully polished, split-pane workspace designed for deep focus and research.*
 
-| ![Screenshot 1](docs/assets/screenshot1.png) | ![Screenshot 2](docs/assets/screenshot2.png) |
-|:---:|:---:|
-| *Main Conversational Interface* | *Grounded Insights & Ship 30 Essays* |
+### Main Conversational Interface
+![Screenshot 1](docs/assets/screenshot1.png)
+*A clean, distraction-free chat interface with chat history management.*
 
-| ![Screenshot 3](docs/assets/screenshot3.png) | ![Screenshot 4](docs/assets/screenshot4.png) |
-|:---:|:---:|
-| *Sandboxed Artifact Viewer* | *Provider Settings & Cloud Fallbacks* |
+### Grounded Insights & Ship 30 Essays
+![Screenshot 2](docs/assets/screenshot2.png)
+*Strictly grounded answers pulling directly from podcast transcripts with inline citations.*
+
+### Sandboxed Artifact Viewer
+![Screenshot 3](docs/assets/screenshot3.png)
+*A secure preview panel for generating and viewing standalone markdown and HTML artifacts.*
+
+### Provider Settings & Cloud Fallbacks
+![Screenshot 4](docs/assets/screenshot4.png)
+*Run 100% locally via Ollama, or gracefully fall back to Anthropic Claude in the cloud.*
 
 ---
 
